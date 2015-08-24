@@ -1,0 +1,12 @@
+[Unit]
+Description=egs
+
+[Service]
+User=root
+WorkingDirectory=/opt/egs/egs/
+ExecStart=python3-gunicorn --bind unix:/tmp/gunicorn.egs.sock egs.wsgi:application
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

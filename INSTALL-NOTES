@@ -21,16 +21,16 @@ cp graphite_shim.conf.example /etc/httpd/conf.d/
 # Also, check for following line in httpd.conf:
 # IncludeOptional conf.d/*.conf
 
-# under es-graphite-shim/ copy shim_local.cfg as shim.cfg
+# under egs/ copy shim_local.cfg as shim.cfg
 # and fill necessary configurations
 
-# copy the following folders to /opt/es-graphite-shim/
-mkdir /opt/es-graphite-shim/
-mkdir /opt/es-graphite-shim/logs /opt/es-graphite-shim/storage
-cp -r es-graphite-shim/ /opt/es-graphite-shim/
+# copy the following folders to /opt/egs/
+mkdir /opt/egs/
+mkdir /opt/egs/logs /opt/egs/storage
+cp -r egs/ /opt/egs/
 
-# Add virtual env in under /opt/es-graphite-shim/
-cd /opt/es-graphite-shim/
+# Add virtual env in under /opt/egs/
+cd /opt/egs/
 virtualenv venv
 source venv/bin/activate
 
@@ -40,12 +40,12 @@ pip install -r requirements.txt
 deactivate
 
 #NOTE: example local config is given under:
-# /opt/es-graphite-shim/conf/local_settings_example.py
+# /opt/egs/conf/local_settings_example.py
 # defaut: http://localhost:9200
-cp /opt/es-graphite-shim/conf/local_settings_example.py \
-   /opt/es-graphite-shim/es-graphite-shim/local_settings.py
+cp /opt/egs/conf/local_settings_example.py \
+   /opt/egs/egs/local_settings.py
 # After this, add your elasticsearch instance and other configurations
-# in /opt/es-graphite-shim/es-graphite-shim/local_settings.py
+# in /opt/egs/egs/local_settings.py
 #  - DB field is optional and is not used currently.
 #    provide the hostname as the host where the shim is to be installed.
 #  - the FRESH field is for an internal functionality. Let it remain as
@@ -64,25 +64,25 @@ cp /opt/es-graphite-shim/conf/local_settings_example.py \
 #    in dropdown list.
 
 # create log files
-touch /opt/es-graphite-shim/logs/error.log
-touch /opt/es-graphite-shim/logs/access.log
+touch /opt/egs/logs/error.log
+touch /opt/egs/logs/access.log
 
 # Optional: create django db and make sure you keep
 # the same password under DATABASE config in:
-# /opt/es-graphite-shim/es-graphite-shim/local_settings.py
-python /opt/es-graphite-shim/es-graphite-shim/manage.py syncdb
+# /opt/egs/egs/local_settings.py
+python /opt/egs/egs/manage.py syncdb
 
-# Go to /opt/es-graphite-shim/es-graphite-shim/es-graphite-shim/settings.py
+# Go to /opt/egs/egs/egs/settings.py
 # set SECRET_KEY to a big random key
 # set ALLOWED_HOSTS to [ 'localhost', '<any other hostnames']
 # by default, it's set to '*'
 # set TIME_ZONE to you local time.
 
-# change ownership/SELinux policies of /opt/es-graphite-shim/
-chown -R apache:apache /opt/es-graphite-shim/
-semanage fcontext -a -t httpd_sys_rw_content_t  '/opt/es-graphite-shim(/.*)?'
-restorecon -v -R /opt/es-graphite-shim/
-restorecon -v -R /opt/es-graphite-shim/*
+# change ownership/SELinux policies of /opt/egs/
+chown -R apache:apache /opt/egs/
+semanage fcontext -a -t httpd_sys_rw_content_t  '/opt/egs(/.*)?'
+restorecon -v -R /opt/egs/
+restorecon -v -R /opt/egs/*
 
 # add ES to http port, so connections from 9200
 # aren't blocked by SELinux for httpd
@@ -95,6 +95,6 @@ setenforce 0
 # restart the httpd server
 service httpd restart
 
-# in case you face errors, check the apache OR es-graphite-shim log files.
+# in case you face errors, check the apache OR egs log files.
 # ultimately, don't forget to switch the 'graphite' URL
 # under config.json in the source of Grafana.

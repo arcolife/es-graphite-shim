@@ -1,30 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Django settings for es-graphite-shim project
+Django settings for egs project
 For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
+https://docs.djangoproject.com/en/1.8/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
+https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-import os
+# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+SECRET_KEY = "$dfct5s9)*)+kt*9=jiosd714c52d4-e64c-9c42-b6724f7b6f6"
 
-try:
-    from local_settings import *
-except Exception as e:
-    raise
+from local_settings import os, cache, BASE_DIR
 
 import socket
 hostname = socket.gethostname()
 del socket
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if hostname == HOSTNAME:
+if hostname == cache.get('HOSTNAME'):
     DEBUG = False
     PRODUCTION = True
 else:
@@ -70,12 +66,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'es-graphite-shim.urls'
-WSGI_APPLICATION = 'es-graphite-shim.wsgi.application'
+ROOT_URLCONF = 'egs.urls'
+WSGI_APPLICATION = 'egs.wsgi.application'
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {}
 # DATABASES = {
@@ -91,7 +87,7 @@ DATABASES = {}
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
+# https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -106,7 +102,7 @@ USE_TZ = True
 STATIC_ROOT = '/mnt/static'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
+# https://docs.djangoproject.com/en/1.8/howto/static-files/
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
@@ -127,8 +123,7 @@ TEMPLATE_LOADERS = (
     # 'django.template.loaders.eggs.Loader',
 )
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates/'),)
-
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'egs/templates/'),)
 # Initiate ElasticSearch connection
 from elasticsearch import Elasticsearch #, client
 from urllib3 import Timeout
@@ -136,42 +131,6 @@ timeoutobj = Timeout(total=1200, connect=10, read=600)
 
 from time import ctime
 print("[%s] - Initiating ES connection" % (ctime()))
-ES = Elasticsearch(host=ES_HOST, port=ES_PORT,
+ES = Elasticsearch(host=cache.get('ES_HOST'), port=cache.get('ES_PORT'),
                    timeout=timeoutobj, max_retries=0)
 print("[%s] - Established ES connection" % (ctime()))
-# get the data to be displayed in drop down list in grafana
-from lib.get_es_metadata import get_fieldnames as _get_fieldnames
-from lib.get_es_metadata import get_open_indices_list as _get_open_indices_list
-# query list of indices in state:open
-
-import json as _js
-_indices_path = os.path.join(BASE_DIR, 'lib/mappings/open_indices.json')
-
-try:
-    if not os.path.exists(_indices_path):
-        _OPEN_INDICES = _get_open_indices_list(ES, INDEX_PREFIX, DOC_TYPE)
-        # dict with index name as key and fieldnames as values
-        f = open(_indices_path, 'wb')
-        f.write(bytes(_js.dumps(_OPEN_INDICES), 'UTF-8'))
-        f.close()
-    else:
-        f = open(_indices_path, 'rb')
-        _OPEN_INDICES = _js.loads(f.read().decode('UTF-8'))
-        f.close()
-except Exception as e:
-    quit("[%s] - ERROR: %s" % (ctime(), e))
-    
-print("[%s] - # of Open Indices: %d" % (ctime(), len(_OPEN_INDICES)))
-
-_FIELDS = _get_fieldnames(ES, FIELD, _OPEN_INDICES, doc_type=DOC_TYPE)
-# remove methods which won't be used any longer
-del _get_fieldnames
-del _get_open_indices_list
-
-
-# build an aggregate dict of mappings to be referred 
-# for field validation each time a query is issued
-from lib.get_es_metadata import get_mappings as _get_mappings
-_MAPPINGS = _get_mappings(ES, DOC_TYPE, _fresh=FRESH)
-del _get_mappings
-del _js

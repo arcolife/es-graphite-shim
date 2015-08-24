@@ -18,22 +18,23 @@ WSGISocketPrefix run/wsgi
 # config.js in place of graphite instance URL
 <VirtualHost *:9000>
         # ServerName localhost
-        DocumentRoot "/opt/es-graphite-shim/"
-        ErrorLog /opt/es-graphite-shim/logs/error.log
-        CustomLog /opt/es-graphite-shim/logs/access.log common
+        DocumentRoot "/opt/egs/"
+        ErrorLog /opt/egs/logs/error.log
+        CustomLog /opt/egs/logs/access.log common
 
  	Header set Access-Control-Allow-Origin "*"
 
 	Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 	Header set Access-Control-Allow-Headers "origin, authorization, accept"
         
-	WSGIDaemonProcess es-graphite-shim python-path=/opt/es-graphite-shim/es-graphite-shim:/opt/rh/python33/root/lib/python3.3/site-packages/
-        WSGIProcessGroup es-graphite-shim
+	# WSGIDaemonProcess egs python-path=/opt/egs/egs:/opt/rh/python33/root/lib/python3.3/site-packages/
+	WSGIDaemonProcess egs python-path=/opt/egs/egs:/usr/lib/python3.4/site-packages/
+        WSGIProcessGroup egs
         WSGIApplicationGroup %{GLOBAL}
-	WSGIImportScript /opt/es-graphite-shim/es-graphite-shim/es-graphite-shim/wsgi.py process-group=es-graphite-shim application-group=%{GLOBAL}	
+	WSGIImportScript /opt/egs/egs/egs/wsgi.py process-group=egs application-group=%{GLOBAL}	
 
-	WSGIScriptAlias / /opt/es-graphite-shim/es-graphite-shim/es-graphite-shim/wsgi.py
-	Alias /content/ /opt/es-graphite-shim/es-graphite-shim/templates/
+	WSGIScriptAlias / /opt/egs/egs/egs/wsgi.py
+	Alias /content/ /opt/egs/egs/templates/
 		
 	<Location "/content/">
 		  SetHandler None
@@ -42,13 +43,13 @@ WSGISocketPrefix run/wsgi
 	</Location>
 
 
-	<Directory /opt/es-graphite-shim/es-graphite-shim/es-graphite-shim/>
+	<Directory /opt/egs/egs/egs/>
 		<Files wsgi.py>
 		   	  Require all granted
 		</Files>
 	</Directory>
 
-    	<Directory /opt/es-graphite-shim/>
+    	<Directory /opt/egs/>
         	   Options All
         	   AllowOverride All
         	   Require all granted

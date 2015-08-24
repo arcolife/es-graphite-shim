@@ -3,7 +3,9 @@
 import json
 import re
 from datetime import datetime, timedelta
-from django.conf import settings
+# from django.conf import settings
+from django.core.cache import cache
+
 from collections import defaultdict
 from time import ctime
 #     from calendar import timegm
@@ -82,7 +84,7 @@ def find_metrics(query):
     """
     response = []    
     query = query.split('.')
-    first_metric_list = settings._FIELDS
+    first_metric_list = cache.get('_FIELDS')
 
     if len(query) == 1:
         if query[0] == '*':
@@ -97,7 +99,7 @@ def find_metrics(query):
                 return json.dumps(response)
 
     elif len(query) >= 2:
-        mappings = settings._MAPPINGS
+        mappings = cache.get('_MAPPINGS')
         doc_types = list(mappings['mappings'].keys())
         assert query[0] in first_metric_list
 
@@ -185,7 +187,7 @@ def query_es(_type=None, _COUNT=10, fieldname=None, _fields=[], _from="-2d", _un
 
     suffix_list = [suffix for suffix in list(indexes.keys())]
     suffix_list.sort(reverse=True)
-    index_list = ["%s.%s-%s" % (settings.INDEX_PREFIX, settings.DOC_TYPE, suffix) for suffix in suffix_list]
+    index_list = ["%s.%s-%s" % (cache.get('INDEX_PREFIX'), cache.get('DOC_TYPE'), suffix) for suffix in suffix_list]
 
     _body = {
         "size": 2**8,
@@ -206,7 +208,7 @@ def query_es(_type=None, _COUNT=10, fieldname=None, _fields=[], _from="-2d", _un
                             },
                             {
                                 "term": {
-                                    settings.FIELD: fieldname,
+                                    cache.get('FIELD'): fieldname,
                                     "_cache": "false"
                                 }
                             }
@@ -221,7 +223,7 @@ def query_es(_type=None, _COUNT=10, fieldname=None, _fields=[], _from="-2d", _un
     print("[%s] - Query Metadata: %s" % \
           (ctime(), _body))
     _body['fields'] = _fields
-    res = settings.ES.search(doc_type=_type, body=_body, index=index_list)
+    res = cache.get('ES').search(doc_type=_type, body=_body, index=index_list)
     _fields.remove("_timestamp")
 
     return [x['fields'] for x in res['hits']['hits']]
@@ -258,8 +260,8 @@ def render_metrics(_TARGETS, _FROM, _UNTIL, _COUNT):
     API of graphite mocked: /render/? 
     """
     response = []
-    first_metric_list = settings._FIELDS
-    mappings = settings._MAPPINGS
+    first_metric_list = cache.get('_FIELDS')
+    mappings = cache.get('_MAPPINGS')
     doc_types = list(mappings['mappings'].keys())
 
     for target in _TARGETS:

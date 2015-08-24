@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-WSGI config for es-graphite-shim project.
+WSGI config for egs project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "es-graphite-shim.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "egs.settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

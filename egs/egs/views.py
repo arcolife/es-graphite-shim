@@ -2,7 +2,8 @@ from django.template import RequestContext
 from django.http import HttpResponse,  HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt #csrf_protect
 from django.shortcuts import render_to_response
-from . import query_formatter as qf
+from lib import query_formatter as qf
+from django.core.cache import cache
 
 def homepage(request):
     """
@@ -21,9 +22,8 @@ def view_mapping(request):
     """
     List all available fields
     """
-    return HttpResponse(qf.json.dumps(qf.settings._MAPPINGS),
+    return HttpResponse(qf.json.dumps(cache.get('_MAPPINGS')),
                         content_type="application/json")
-
 
 @csrf_exempt
 def metrics_render(request):
@@ -103,3 +103,6 @@ def dashboard_find(request):
 
     else:
         return HttpResponseNotFound('<h1>Method Not Allowed</h1>')
+
+from lib import build_fixtures
+build_fixtures.main()

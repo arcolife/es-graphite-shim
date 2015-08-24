@@ -5,9 +5,9 @@ Shim for mocking Graphite instance through ElasticSearch, for Grafana.
 
 ### INSTALLATION
 
-Refer to `INSTALL-NOTES` for help on installing this script.
+- Refer to `INSTALL-NOTES` for help on installing this script.
 
-Or you could just build the Dockerfile included here and fire the container.
+- Or you could just build `Dockerfile` included here and fire up the container.
 Instructions for building and starting the container, are included in the Dockerfile.
 Before that, make sure you have copied `conf/local_settings_example.py` into
 `conf/local_settings.py` and edited the params as required. Help on editing those

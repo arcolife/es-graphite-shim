@@ -6,7 +6,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     )
-urlpatterns += patterns('es-graphite-shim.views',
+urlpatterns += patterns('egs.views',
     url(r'^$', 'homepage', name='home'),
     url(r'^mapping/?$', 'view_mapping', name='mapping'),
     url(r'^render/?$', 'metrics_render', name='render'),
