@@ -27,6 +27,9 @@ COPY requirements.txt /opt/egs/
 COPY conf/local_settings.py /opt/egs/egs/
 RUN chmod a+x /opt/egs/egs/egs/wsgi.py
 
+# for gunicorn socket
+RUN mkdir /var/egs
+
 WORKDIR /opt/egs
 RUN pip3 install -r /opt/egs/requirements.txt
 RUN easy_install-3.4 importlib
@@ -37,6 +40,7 @@ COPY conf/gunicorn.service /lib/systemd/system/gunicorn.service
 
 # modify selinux policies and folder ownerships
 RUN chown -R nginx:nginx /opt/egs/
+RUN chown -R nginx:nginx /var/egs/
 
 # add root password
 RUN echo "root:egs_shim" | chpasswd
@@ -44,8 +48,11 @@ RUN echo "root:egs_shim" | chpasswd
 # add test page content
 RUN echo "Shim test page" >> /var/www/html/index.html
 
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+# RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 RUN echo "nginx on Fedora" > /usr/share/nginx/html/index.html
 
+RUN systemctl enable nginx
+RUN systemctl enable gunicorn
+
 # Launch nginx
-CMD [ "/usr/sbin/nginx" ]
+CMD [ "/usr/sbin/init" ]

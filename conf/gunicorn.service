@@ -2,8 +2,8 @@
 Description=egs
 
 [Service]
-User=root
-ExecStart=/usr/bin/python3-gunicorn --bind unix:/run/gunicorn.egs.sock --chdir=/opt/egs/egs/ egs.wsgi:application
+User=nginx
+ExecStart=/usr/bin/python3-gunicorn --bind unix:/var/egs/gunicorn.egs.sock --chdir=/opt/egs/egs/ egs.wsgi:application
 StandardOutput=syslog
 StandardError=syslog
 
