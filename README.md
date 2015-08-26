@@ -5,13 +5,18 @@ Shim for mocking Graphite instance through ElasticSearch, for Grafana.
 
 ### INSTALLATION
 
-- Refer to `INSTALL-NOTES` for help on installing this script.
+- Build the Dockerfile included here for containerized solution. Instructions
+  for building and starting the container, are included in the Dockerfile.
+  Before that, make sure you have copied `conf/local_settings_example.py` into
+  `conf/local_settings.py` and edited the params as required. Help on editing those
+  parameters is given under `INSTALL-NOTES` (which was originally developed for an
+  apache based solution, but is now only for config referral purposes, since we have
+  migrated to nginx based solution.)
 
-- Or you could just build `Dockerfile` included here and fire up the container.
-Instructions for building and starting the container, are included in the Dockerfile.
-Before that, make sure you have copied `conf/local_settings_example.py` into
-`conf/local_settings.py` and edited the params as required. Help on editing those
-parameters is given under `INSTALL-NOTES`
+- For a real machine deployment, for now there is no documentation,
+  so try to use the steps as in the Dockerfile. One additional step is
+  needed in that case, which is to permit selinux to allow nginx to bind
+  to the port given in nginx config file egs.conf.example
 
 - Make sure you supply the params to config.js in grafana accordingly. Refer below:
 ```js
@@ -46,10 +51,8 @@ django project would be executed.
 
 ``` $ python manage.py runserver ```
 
-Or, you might deploy this on a production server. For this,
-refer to the sample apache based deployment help guide included
-within the source code, in a file called INSTALL-NOTES and sample
-apache config under conf/graphite_shim.conf.example
+Or, you might deploy this on a production server using nginx sample config file,
+included with the source code, under ```conf/egs.conf.example```. '
 
 Following that, on homepage, you will see some sample links.
 

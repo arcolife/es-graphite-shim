@@ -1,3 +1,5 @@
+## THIS IS ONLY FOR APACHE BASED DEPLOYMENTS
+
 # SPECIAL NOTE:
 # Stick to a PORT value and keep it constant throughout
 # the installation steps. (make sure it doesn't collide with
