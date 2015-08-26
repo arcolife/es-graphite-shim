@@ -22,7 +22,7 @@ RUN dnf install -y mod_wsgi nginx && dnf clean all
 
 RUN mkdir -p /opt/egs/egs/
 ADD egs/ /opt/egs/egs/
-# RUN mkdir /opt/egs/logs/; touch /opt/egs/logs/error.log; touch /opt/egs/logs/access.log
+RUN mkdir /opt/egs/logs/
 COPY requirements.txt /opt/egs/
 COPY conf/local_settings.py /opt/egs/egs/
 RUN chmod a+x /opt/egs/egs/egs/wsgi.py

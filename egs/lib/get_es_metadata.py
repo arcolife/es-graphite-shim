@@ -1,10 +1,12 @@
 import os
 import json
+import logging
 from elasticsearch import client
 from collections import defaultdict
 from time import ctime
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+logger = logging.getLogger(__name__)
 
 def get_fieldnames(es_conn, _field, _indices, result=[], doc_type=''):
     """
@@ -19,7 +21,7 @@ def get_fieldnames(es_conn, _field, _indices, result=[], doc_type=''):
 
     N = 50
     for _ix in range(0, len(_indices), N):
-        print("[%s] - %d Indices being processed starting from %d" % (ctime(), N, _ix))
+        logger.info("[%s] - %d Indices being processed starting from %d" % (ctime(), N, _ix))
         current = []
         res = es_conn.search(doc_type=doc_type, body=_aggs,
                              search_type='count', index=_indices[_ix:_ix+N])
@@ -76,6 +78,6 @@ def get_mappings(es_conn, doc_type, _fresh=False):
             f.close()
             return _MAPPINGS
         except:
-            print("[%s] - WARNING: es_mappings.json doesn't exist; falling back to issuing es query"\
+            logger.info("[%s] - WARNING: es_mappings.json doesn't exist; falling back to issuing es query"\
                   % (ctime()))
             return issue_mappings_query(es_conn, doc_type)

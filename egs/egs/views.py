@@ -4,6 +4,10 @@ from django.views.decorators.csrf import csrf_exempt #csrf_protect
 from django.shortcuts import render_to_response
 from lib import query_formatter as qf
 from django.core.cache import cache
+from lib import build_fixtures
+
+# initiate build_fixtures
+build_fixtures.start_threading()
 
 def homepage(request):
     """
@@ -103,6 +107,3 @@ def dashboard_find(request):
 
     else:
         return HttpResponseNotFound('<h1>Method Not Allowed</h1>')
-
-from lib import build_fixtures
-build_fixtures.main()

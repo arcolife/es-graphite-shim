@@ -3,6 +3,7 @@ get the data to be displayed in drop down list in grafana
 """
 
 import json
+import logging
 import os, sys
 from time import ctime
 from threading import Thread, Event
@@ -15,7 +16,7 @@ from django.conf import settings
 
 _run = True
 _index = Event()
-
+logger = logging.getLogger(__name__)
 
 def build_open_indices(_new=None):
     ''' 
@@ -31,9 +32,9 @@ def build_open_indices(_new=None):
         
         if _run:
             try:
-                print("[%s] _bkgthd._fixture_builder - begin (%s)" % (ctime(), 'build_open_indices'))
+                logger.info("[%s] _bkgthd._fixture_builder - begin (%s)" % (ctime(), 'build_open_indices'))
                 if _new:
-                    print("[%s] _bkgthd._fixture_builder - [open indices] building new list" % (ctime()))
+                    logger.info("[%s] _bkgthd._fixture_builder - [open indices] building new list" % (ctime()))
                     _OPEN_INDICES = _get_open_indices_list(settings.ES, \
                                                         cache.get('INDEX_PREFIX'), \
                                                         cache.get('DOC_TYPE'))
@@ -42,49 +43,46 @@ def build_open_indices(_new=None):
                     f.write(bytes(json.dumps(_OPEN_INDICES), 'UTF-8'))
                     f.close()    
                 else:
-                    print("[%s] _bkgthd._fixture_builder - [open indices] opening saved list" % (ctime()))
+                    logger.info("[%s] _bkgthd._fixture_builder - [open indices] opening saved list" % (ctime()))
                     f = open(cache.get('_indices_path'), 'rb')
                     _OPEN_INDICES = json.loads(f.read().decode('UTF-8'))
                     f.close()
 
                 cache.set('_OPEN_INDICES', _OPEN_INDICES)
-                print("[%s] _bkgthd._fixture_builder - len([open indices]) = %d" % (ctime(), len(_OPEN_INDICES)))
+                logger.info("[%s] _bkgthd._fixture_builder - len([open indices]) = %d" % (ctime(), len(_OPEN_INDICES)))
 
                 # get fieldnames list
                 if not os.path.exists(cache.get('_fields_path')):
-                    print("[%s] _bkgthd._fixture_builder - [fieldnames] building new list" % (ctime()))
+                    logger.info("[%s] _bkgthd._fixture_builder - [fieldnames] building new list" % (ctime()))
                     _FIELDS = _get_fieldnames(settings.ES, \
                                             cache.get('FIELD'), \
                                             cache.get('_OPEN_INDICES'), \
                                             doc_type=cache.get('DOC_TYPE'))
                 else:
-                    print("[%s] _bkgthd._fixture_builder - [fieldnames] opening saved list" % (ctime()))
+                    logger.info("[%s] _bkgthd._fixture_builder - [fieldnames] opening saved list" % (ctime()))
                     # dict with index name as key and fieldnames as values
                     f = open(cache.get('_fields_path'), 'wb')
                     f.write(bytes(json.dumps(_FIELDS), 'UTF-8'))
                     f.close()
                 cache.set('_FIELDS', _FIELDS)
 
-                print("[%s] _bkgthd._fixture_builder - [mappings] getting mappings" % (ctime()))
+                logger.info("[%s] _bkgthd._fixture_builder - [mappings] getting mappings" % (ctime()))
                 cache.set('_MAPPINGS', _get_mappings(settings.ES, cache.get('DOC_TYPE'), _fresh=cache.get('FRESH')))
-                print("[%s] _bkgthd._fixture_builder - [mappings] got mappings" % (ctime()))
+                logger.info("[%s] _bkgthd._fixture_builder - [mappings] got mappings" % (ctime()))
 
             except Exception as exc:
-                print("[%s] _bkgthd._fixture_builder - err (%s): %r" % (ctime(), 'build_open_indices', exc), file=sys.stderr)
+                logger.info("[%s] _bkgthd._fixture_builder - err (%s): %r" % (ctime(), 'build_open_indices', exc), file=sys.stderr)
             else:
-                print("[%s] _bkgthd._fixture_builder - end (%s)" % (ctime(), 'build_open_indices'))
+                logger.info("[%s] _bkgthd._fixture_builder - end (%s)" % (ctime(), 'build_open_indices'))
         else:
-            print("[%s] _bkgthd._fixture_builder: no-op" % ctime(), file=sys.stderr)
+            logger.info("[%s] _bkgthd._fixture_builder: no-op" % ctime(), file=sys.stderr)
 
-
-def main():
-    """
-    start threading
-    """
+            
+def start_threading():
     _index.set()
-
-    if not os.path.exists(cache.get('_indices_path')) or not os.path.getsize(cache.get('_indices_path')):
+    if not os.path.exists(cache.get('_indices_path')) or \
+       not os.path.getsize(cache.get('_indices_path')):
         _bkgthd = Thread(target=build_open_indices, daemon=True, kwargs={'_new': True})
     else:
-        _bkgthd = Thread(target=build_open_indices, daemon=True, kwargs={'_new': False})
+        _bkgthd = Thread(target=build_open_indices, daemon=True, kwargs={'_new': False})    
     _bkgthd.start()

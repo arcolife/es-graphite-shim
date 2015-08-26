@@ -1,5 +1,8 @@
 import os
 from django.core.cache import cache
+from elasticsearch import Elasticsearch
+from urllib3 import Timeout
+from time import ctime
 
 # don't change this. It's not present in main settings.py file, because
 # we needed it here first for the _indices_path and _fields_path
@@ -36,3 +39,8 @@ cache.set('FRESH',<boolean: True/False>)
 import socket as _sock
 cache.set('HOSTNAME',_sock.gethostname())
 del _sock
+
+# Initiate ElasticSearch connection
+timeoutobj = Timeout(total=1200, connect=10, read=600)
+ES = Elasticsearch(host=cache.get('ES_HOST'), port=cache.get('ES_PORT'),
+                   timeout=timeoutobj, max_retries=0)

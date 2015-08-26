@@ -1,16 +1,15 @@
 #!/usr/bin/python
 
-import json
 import re
+import json
+import logging
 from datetime import datetime, timedelta
-# from django.conf import settings
 from django.core.cache import cache
-
 from collections import defaultdict
 from time import ctime
-#     from calendar import timegm
-#     dt = datetime.strptime(tmp, "%Y-%m-%d %H:%M:%S")
-#     return timegm(dt.utctimetuple())
+
+logger = logging.getLogger(__name__)
+
 
 def flatten_list(L):
     v = []
@@ -220,8 +219,10 @@ def query_es(_type=None, _COUNT=10, fieldname=None, _fields=[], _from="-2d", _un
         }
     }
 
-    print("[%s] - Query Metadata: %s" % \
-          (ctime(), _body))
+    # comment for now, since it adds a lot to the
+    # log. TODO: Think of a better solution
+    # logger.info("[%s] - Query Metadata: %s" % \
+    #       (ctime(), _body))
     _body['fields'] = _fields
     res = cache.get('ES').search(doc_type=_type, body=_body, index=index_list)
     _fields.remove("_timestamp")

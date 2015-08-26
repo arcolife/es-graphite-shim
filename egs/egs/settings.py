@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 SECRET_KEY = "$dfct5s9)*)+kt*9=jiosd714c52d4-e64c-9c42-b6724f7b6f6"
 
-from local_settings import os, cache, BASE_DIR
+from local_settings import os, cache, BASE_DIR, ES
 
 import socket
 hostname = socket.gethostname()
@@ -124,13 +124,25 @@ TEMPLATE_LOADERS = (
 )
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'egs/templates/'),)
-# Initiate ElasticSearch connection
-from elasticsearch import Elasticsearch #, client
-from urllib3 import Timeout
-timeoutobj = Timeout(total=1200, connect=10, read=600)
 
-from time import ctime
-print("[%s] - Initiating ES connection" % (ctime()))
-ES = Elasticsearch(host=cache.get('ES_HOST'), port=cache.get('ES_PORT'),
-                   timeout=timeoutobj, max_retries=0)
-print("[%s] - Established ES connection" % (ctime()))
+# django log setup.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+        'logfile': {
+            'level':'DEBUG',
+            'class':'logging.FileHandler',
+            # 'filename': os.path.join(BASE_DIR, 'egs', 'django.log'),
+            'filename': '/opt/egs/logs/django.log',
+        },
+    },
+    'root': {
+        'level': 'INFO',
+        'handlers': ['console', 'logfile']
+    },
+}
