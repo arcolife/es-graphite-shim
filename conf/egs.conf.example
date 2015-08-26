@@ -1,15 +1,11 @@
 upstream egs_app_server {
-    server unix:/tmp/gunicorn.egs.sock fail_timeout=0;
+    server unix:/run/gunicorn.egs.sock fail_timeout=0;
     # For a TCP configuration:
     #server 127.0.0.1:8000 fail_timeout=0;
 }
 
-upstream elasticsearch {
-
-}
-
 server {
-    listen       8000,9200,127.0.0.1;
+    listen       8000;
     #     server_name  "";
     root         /opt/egs/egs/nginx_root/;
     index        index.html index.htm;
