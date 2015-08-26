@@ -82,26 +82,9 @@ def main():
     start threading
     """
     _index.set()
-    # pool = eventlet.GreenPool()
-    # process indices/fieldname list
+
     if not os.path.exists(cache.get('_indices_path')) or not os.path.getsize(cache.get('_indices_path')):
-        #gevent.spawn(build_open_indices(_new=True))
-        # pool.spawn_n(build_open_indices(_new=True))
         _bkgthd = Thread(target=build_open_indices, daemon=True, kwargs={'_new': True})
     else:
-        #gevent.spawn(build_open_indices(_new=False))
-        # pool.spawn_n(build_open_indices(_new=False))
         _bkgthd = Thread(target=build_open_indices, daemon=True, kwargs={'_new': False})
     _bkgthd.start()
-
-    # _bkgthd2 = Thread(target=_get_mappings, daemon=True, args=(ES, DOC_TYPE),  kwargs={'_fresh' : FRESH})
-    # _bkgthd2.start()
-
-    # for body in pool.imap(foo): print(body)
-    # # remove methods which won't be used any longer
-    # del _get_fieldnames
-    # del _get_open_indices_list
-    # # build an aggregate dict of mappings to be referred 
-    # # for field validation each time a query is issued
-    # del _get_mappings
-    # del json

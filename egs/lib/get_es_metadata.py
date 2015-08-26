@@ -6,7 +6,6 @@ from time import ctime
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-# def get_fieldnames(es_conn, _field, _indices, result=defaultdict(list), doc_type=''):
 def get_fieldnames(es_conn, _field, _indices, result=[], doc_type=''):
     """
     Runs Elasticsearch aggs for all fieldnames 
