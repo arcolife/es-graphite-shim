@@ -1,7 +1,14 @@
-es-graphite-shim
+es-graphite-shim 
 ================
 
-Shim for mocking Graphite instance through ElasticSearch, for Grafana.
+[![Stories in Ready](https://badge.waffle.io/distributed-system-analysis/es-graphite-shim.png?label=ready&title=Ready)](https://waffle.io/distributed-system-analysis/es-graphite-shim)
+
+### DESCRIPTION
+
+[ElasticSearch as a timeseries Data source for Grafana](https://github.com/grafana/grafana/issues/1034):
+There has been an ongoing discussion about this and ELK is a very useful stack indeed.
+Hence, we came up with this shim, which does just that, by mocking Graphite instance API,
+pipelining data from ElasticSearch, for Grafana.
 
 ### INSTALLATION
 
@@ -71,6 +78,15 @@ There are two categories of the shim API, as follows:
 2. __Metric Search Query Type__: Here, when * is given, all the parent nodes in the metric path hierarchy are displayed as a result, along with information like, whether its a leaf node or not.
 
   - Format: ```/metrics/find?query=*```
+
+
+## Is there a place to track current and future work items?
+Yes, we are using GitHub Issues and Pull Requests managed via
+[Waffle.io](https://waffle.io/distributed-system-analysis/es-graphite-shim) for that.
+
+
+## Is there a mailing list for discussions?
+Yes, [Google Groups](https://groups.google.com/forum/#!forum/es-graphite-shim)
 
 ### LICENSE
 Refer to the file 'LICENSE'.
