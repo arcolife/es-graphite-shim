@@ -6,7 +6,7 @@
 # To run using the container, refer the following command:
 # docker run --privileged -it -d \
 #		-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-#		-p 9000:9000 -p 9001:80 egs_shim
+#		-p 8000:8000 egs_shim
 
 # this port should be same as one configured for the shim
 ###########################################################

@@ -8,16 +8,10 @@ Shim for mocking Graphite instance through ElasticSearch, for Grafana.
 - Build the Dockerfile included here for containerized solution. Instructions
   for building and starting the container, are included in the Dockerfile.
   Before that, make sure you have copied `conf/local_settings_example.py` into
-  `conf/local_settings.py` and edited the params as required. Help on editing those
-  parameters is given under `INSTALL-NOTES` (which was originally developed for an
-  apache based solution, but is now only for config referral purposes, since we have
-  migrated to nginx based solution.)
+  `conf/local_settings.py` and edited the params as required. 
 
-- For a real machine deployment, for now there is no documentation,
-  so try to use the steps as in the Dockerfile. One additional step is
-  needed in that case, which is to permit selinux to allow nginx to bind
-  to the port given in nginx config file egs.conf.example
-
+- For a real machine deployment, refer to `INSTALL-NOTES` ,
+  
 - Make sure you supply the params to config.js in grafana accordingly. Refer below:
 ```js
 ..

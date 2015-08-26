@@ -1,0 +1,75 @@
+# SPECIAL NOTE:
+# Stick to a PORT value and keep it constant throughout
+# the installation steps. (make sure it doesn't collide with
+# already running service on the same port.
+# Take port based on the ones allowed under SELinux Policy
+# to http. Check with following command:
+# $ sudo semanage port -l | grep http
+
+# Recommended: Take PORT as 8000
+# this port should be same as one configured for the shim
+###########################################################
+
+dnf -y update && dnf clean all
+
+dnf install -y procps-ng tar wget vim gcc python3 python3-devel python3-gunicorn 
+dnf install -y mod_wsgi nginx && dnf clean all
+
+mkdir -p /opt/egs/egs/
+cp -r egs/ /opt/egs/egs/
+mkdir /opt/egs/logs/; touch /opt/egs/logs/error.log; touch /opt/egs/logs/access.log
+cp requirements.txt /opt/egs/
+
+# make sure this file exists and that you've configured it accordingly 
+# by referring to conf/local_settings_example.py
+cp conf/local_settings.py /opt/egs/egs/
+chmod a+x /opt/egs/egs/egs/wsgi.py
+
+# for gunicorn socket
+mkdir /var/egs
+
+cd /opt/egs
+pip3 install -r /opt/egs/requirements.txt
+easy_install-3.4 importlib
+
+# add nginx configs
+cp conf/egs.conf.example /etc/nginx/conf.d/egs.conf
+cp conf/gunicorn.service /lib/systemd/system/gunicorn.service
+
+# modify selinux policies and folder ownerships
+chown -R nginx:nginx /opt/egs/
+chown -R nginx:nginx /var/egs/
+
+# add root password
+echo "root:egs_shim" | chpasswd
+
+# add test page content
+echo "Shim test page" >> /var/www/html/index.html
+
+# RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+echo "nginx on Fedora" > /usr/share/nginx/html/index.html
+
+systemctl enable nginx
+systemctl enable gunicorn
+
+# stop instance if up already
+systemctl stop nginx.service 
+systemctl stop gunicorn.service 
+
+# Launch nginx and gunicorn
+systemctl start gunicorn.service 
+systemctl start nginx.service 
+
+# get status of nginx and gunicorn
+systemctl status gunicorn.service 
+systemctl status nginx.service 
+
+# if this fails to start, check selinux logs
+# or refer to journalctl -xe
+# you might have to run the following commands
+#      # grep nginx /var/log/audit/audit.log | audit2allow -M mypol
+#      # semodule -i mypol.pp
+#              OR 
+#      # setenforce 0
+
+# ..and then restart nginx and gunicorn services
