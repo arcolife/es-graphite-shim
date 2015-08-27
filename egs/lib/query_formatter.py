@@ -3,10 +3,11 @@
 import re
 import json
 import logging
+from time import ctime
+from django.conf import settings
 from datetime import datetime, timedelta
 from django.core.cache import cache
 from collections import defaultdict
-from time import ctime
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +225,7 @@ def query_es(_type=None, _COUNT=10, fieldname=None, _fields=[], _from="-2d", _un
     # logger.info("[%s] - Query Metadata: %s" % \
     #       (ctime(), _body))
     _body['fields'] = _fields
-    res = cache.get('ES').search(doc_type=_type, body=_body, index=index_list)
+    res = settings.ES.search(doc_type=_type, body=_body, index=index_list)
     _fields.remove("_timestamp")
 
     return [x['fields'] for x in res['hits']['hits']]

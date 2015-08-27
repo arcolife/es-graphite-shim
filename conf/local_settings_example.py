@@ -1,18 +1,7 @@
-import os
 from django.core.cache import cache
 from elasticsearch import Elasticsearch
 from urllib3 import Timeout
-from time import ctime
 
-# don't change this. It's not present in main settings.py file, because
-# we needed it here first for the _indices_path and _fields_path
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-
-# change this to wherever you wish them to exist.
-cache.set('_indices_path', os.path.join(BASE_DIR, \
-						'egs/lib/mappings/open_indices.json'))
-cache.set('_fields_path', os.path.join(BASE_DIR, \
-						'egs/lib/mappings/fields_list.json'))
 
 ##### Change config below
 cache.set('ES_HOST',"<your ES instance path>")

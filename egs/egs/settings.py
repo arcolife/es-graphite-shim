@@ -13,7 +13,18 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 SECRET_KEY = "$dfct5s9)*)+kt*9=jiosd714c52d4-e64c-9c42-b6724f7b6f6"
 
-from local_settings import os, cache, BASE_DIR, ES
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+import os
+
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+from local_settings import cache, ES
 
 import socket
 hostname = socket.gethostname()
@@ -123,7 +134,7 @@ TEMPLATE_LOADERS = (
     # 'django.template.loaders.eggs.Loader',
 )
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'egs/templates/'),)
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates/'),)
 
 # django log setup.
 LOGGING = {
@@ -137,7 +148,7 @@ LOGGING = {
         'logfile': {
             'level':'DEBUG',
             'class':'logging.FileHandler',
-            # 'filename': os.path.join(BASE_DIR, 'egs', 'django.log'),
+            # 'filename': os.path.join(BASE_DIR, 'django.log'),
             'filename': '/opt/egs/logs/django.log',
         },
     },
