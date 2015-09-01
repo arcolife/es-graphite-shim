@@ -1,3 +1,5 @@
+import logging
+from time import ctime
 from django.template import RequestContext
 from django.http import HttpResponse,  HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt #csrf_protect
@@ -8,6 +10,8 @@ from lib import build_fixtures
 
 # initiate build_fixtures
 build_fixtures.start_threading()
+logger = logging.getLogger(__name__)
+
 
 def homepage(request):
     """
@@ -33,14 +37,11 @@ def view_mapping(request):
 def metrics_render(request):
     try:
         if request.method == 'POST':
-            data = qf.json.loads(request.body.decode('utf-8'))
-            _TARGETS = data['target']
-            if not isinstance(_TARGETS, list):
-                _TARGETS = [_TARGETS]
-            _FROM = data['from']
-            _UNTIL = data['until']
-            _FORMAT = data['format']
-            
+            _TARGETS = request.POST.getlist('target', None)
+            _FROM = request.POST.get('from', None)
+            _UNTIL = request.POST.get('until', None)
+            _FORMAT = request.POST.get('format', None)
+
             # _COUNT = request.POST.get('maxDataPoints', 10)
             # FIXME: limit count to 10 for now. Remove constraint
             # once caching and other optimization techniques are
