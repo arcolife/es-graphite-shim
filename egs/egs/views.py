@@ -31,49 +31,55 @@ def view_mapping(request):
 
 @csrf_exempt
 def metrics_render(request):
-    if request.method == 'POST':
-        _TARGETS = request.POST.getlist('target', None)
-        _FROM = request.POST.get('from', None)
-        _UNTIL = request.POST.get('until', None)
+    try:
+        if request.method == 'POST':
+            data = qf.json.loads(request.body.decode('utf-8'))
+            _TARGETS = data['target']
+            if not isinstance(_TARGETS, list):
+                _TARGETS = [_TARGETS]
+            _FROM = data['from']
+            _UNTIL = data['until']
+            _FORMAT = data['format']
+            
+            # _COUNT = request.POST.get('maxDataPoints', 10)
+            # FIXME: limit count to 10 for now. Remove constraint
+            # once caching and other optimization techniques are
+            # included, so that ES instance doesn't get bombarded
+            # every time maxDataPoints goes above 1000 or something
+            _COUNT = 10
 
-        # _COUNT = request.POST.get('maxDataPoints', 10)
-        # FIXME: limit count to 10 for now. Remove constraint
-        # once caching and other optimization techniques are
-        # included, so that ES instance doesn't get bombarded
-        # every time maxDataPoints goes above 1000 or something
-        _COUNT = 10
+            if _TARGETS and _FROM and _UNTIL and (_FORMAT == 'json'):
+                return HttpResponse(qf.render_metrics(_TARGETS,
+                                                   _FROM,
+                                                   _UNTIL,
+                                                   _COUNT),
+                                    content_type="application/json")
+            else:
+                return HttpResponse('[]', content_type="application/json")
 
-        _FORMAT = request.POST.get('format', None)
+        elif request.method == 'GET':
+            _TARGETS = request.GET.getlist('target', None)
+            _FROM = request.GET.get('from', None)
+            _UNTIL = request.GET.get('until', None)
 
-        if _TARGETS and _FROM and _UNTIL and (_FORMAT == 'json'):
-            return HttpResponse(qf.render_metrics(_TARGETS,
-                                               _FROM,
-                                               _UNTIL,
-                                               _COUNT),
-                                content_type="application/json")
+            # _COUNT = request.GET.get('maxDataPoints', 10)
+            _COUNT = 10
+
+            _FORMAT = request.GET.get('format', None)
+            if _TARGETS and _FROM and _UNTIL and (_FORMAT == 'json'):
+                return HttpResponse(qf.render_metrics(_TARGETS,
+                                                   _FROM,
+                                                   _UNTIL,
+                                                   _COUNT),
+                                    content_type="application/json")
+            else:
+                return HttpResponse('[]', content_type="application/json")
+
         else:
-            return HttpResponse('[]', content_type="application/json")
+            return HttpResponseNotFound('<h1>Method Not Allowed</h1>')        
 
-    elif request.method == 'GET':
-        _TARGETS = request.GET.getlist('target', None)
-        _FROM = request.GET.get('from', None)
-        _UNTIL = request.GET.get('until', None)
-
-        # _COUNT = request.GET.get('maxDataPoints', 10)
-        _COUNT = 10
-
-        _FORMAT = request.GET.get('format', None)
-        if _TARGETS and _FROM and _UNTIL and (_FORMAT == 'json'):
-            return HttpResponse(qf.render_metrics(_TARGETS,
-                                               _FROM,
-                                               _UNTIL,
-                                               _COUNT),
-                                content_type="application/json")
-        else:
-            return HttpResponse('[]', content_type="application/json")
-
-    else:
-        return HttpResponseNotFound('<h1>Method Not Allowed</h1>')        
+    except:
+        return HttpResponse('[]', content_type="application/json")
 
     
 def metrics_find(request):

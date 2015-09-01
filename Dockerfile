@@ -42,9 +42,7 @@ RUN echo "root:egs_shim" | chpasswd
 
 RUN echo "nginx on Fedora" > /usr/share/nginx/html/index.html
 
-RUN systemctl enable nginx
-RUN systemctl enable gunicorn
-RUN systemctl enable memcached
+RUN systemctl enable memcached gunicorn nginx
 
 # Launch nginx
 CMD [ "/usr/sbin/init" ]
