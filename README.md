@@ -90,3 +90,6 @@ Yes, [Google Groups](https://groups.google.com/forum/#!forum/es-graphite-shim)
 
 ### LICENSE
 Refer to the file 'LICENSE'.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arcolife/es-graphite-shim/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
