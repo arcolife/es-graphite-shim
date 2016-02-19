@@ -11,14 +11,11 @@
 # this port should be same as one configured for the shim
 ###########################################################
 
-FROM fedora:22
+FROM fedora:23
 MAINTAINER arcolife <archit.py@gmail.com>
 
-RUN dnf -y update && dnf clean all
-
 # Install useful packages
-RUN dnf install -y procps-ng tar wget vim gcc python3 python3-devel python3-gunicorn 
-RUN dnf install -y nginx memcached && dnf clean all
+RUN dnf install -y procps-ng tar wget vim gcc python3 python3-devel python3-gunicorn nginx memcached
 
 RUN mkdir -p /opt/egs/egs/ && mkdir /opt/egs/logs/ && mkdir /var/egs
 ADD egs/ /opt/egs/egs/
